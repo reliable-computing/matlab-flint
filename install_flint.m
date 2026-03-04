@@ -19,6 +19,13 @@ function install_flint (cmd)
     cflags = {'-Wall', '-Wextra', '-Imex'};
     ldflags = {'-lflint', '-lmpfr', '-lgmp'};
 
+    if ismac()
+      [~, brew_path] = system ('brew --prefix');
+      brew_path = deblank (brew_path);
+      cflags = {cflags{:}, ['-I', fullfile(brew_path, 'include')]};
+      ldflags = {ldflags{:}, ['-L', fullfile(brew_path, 'lib')]};
+    end
+
     try
       if (exist('OCTAVE_VERSION', 'builtin') == 5)
         mex (cflags{:}, cfiles{:}, ldflags{:});
