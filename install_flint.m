@@ -20,7 +20,7 @@ function install_flint (cmd)
     ldflags = {'-lflint', '-lmpfr', '-lgmp'};
     
     if ispc ()
-        ldflags = {fullfile('c', 'msys64', 'mingw64', 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
+        ldflags = {['-L', fullfile('c:', 'msys64', 'mingw64', 'lib')], fullfile('c:', 'msys64', 'mingw64', 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
     elseif ismac()
       [~, brew_path] = system ('brew --prefix');
       brew_path = deblank (brew_path);
@@ -35,7 +35,7 @@ function install_flint (cmd)
         mex (['CFLAGS="$CFLAGS ', strjoin(cflags, ' '), '"'], cfiles{:}, ldflags{:});
       end
       if ispc ()
-          copyfile (['mex_flint_interface.', mexext()], fullfile('c', 'msys64', 'mingw64', 'bin'));
+          copyfile (['mex_flint_interface.', mexext()], fullfile('c:', 'msys64', 'mingw64', 'bin'));
       end
     catch exception
       cd (old_dir);
