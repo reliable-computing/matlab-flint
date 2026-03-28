@@ -28,7 +28,7 @@ FLINT is ready to use.
 
 Simple calculation:
 ```matlab
->> x = arb_t('1.1', 30), y = arb_t('1.01', 30), x + y
+>> x = ap('1.1', 30), y = ap('1.01', 30), x + y
 x =
 
 [1.10000000 +/- 2.24e-9]

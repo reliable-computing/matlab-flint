@@ -18,8 +18,10 @@ function install_flint (cmd)
               fullfile(flint_dir, 'mex', 'mex_arb_t.c')};
     cflags = {'-Wall', '-Wextra', '-Imex'};
     ldflags = {'-lflint', '-lmpfr', '-lgmp'};
-
-    if ismac()
+    
+    if ispc ()
+        ldflags = {fullfile('c', 'msys64', 'mingw64', 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
+    elseif ismac()
       [~, brew_path] = system ('brew --prefix');
       brew_path = deblank (brew_path);
       cflags = {cflags{:}, ['-I', fullfile(brew_path, 'include')]};
@@ -32,6 +34,9 @@ function install_flint (cmd)
       else
         mex (['CFLAGS="$CFLAGS ', strjoin(cflags, ' '), '"'], cfiles{:}, ldflags{:});
       end
+      if ispc ()
+          copyfile (['mex_flint_interface.', mexext()], fullfile('c', 'msys64', 'mingw64', 'bin'));
+      end
     catch exception
       cd (old_dir);
       error ('MEX interface creation failed: %s\n\nFLINT cannot be used.', exception.message);
@@ -42,6 +47,9 @@ function install_flint (cmd)
   cd (old_dir);
 
   add_to_path_if_not_exists (flint_dir);
+  if ispc ()
+      add_to_path_if_not_exists (fullfile ('c', 'msys64', 'mingw64', 'bin'));
+  end
 
   disp ('FLINT is ready to use.');
   disp (['    Detected FLINT version: ', mex_flint_interface(22)]);
