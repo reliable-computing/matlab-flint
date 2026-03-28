@@ -20,7 +20,9 @@ function install_flint (cmd)
     ldflags = {'-lflint', '-lmpfr', '-lgmp'};
     
     if ispc ()
-        ldflags = {['-L', fullfile('c:', 'msys64', 'mingw64', 'lib')], fullfile('c:', 'msys64', 'mingw64', 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
+        msys64_path = fullfile('c:', 'msys64', 'mingw64');
+        cflags = {cflags{:}, ['-I', fullfile(msys64_path, 'include')]};
+        ldflags = {['-L', fullfile(msys64_path, 'lib')], fullfile(msys64_path, 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
     elseif ismac()
       [~, brew_path] = system ('brew --prefix');
       brew_path = deblank (brew_path);
