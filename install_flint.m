@@ -21,13 +21,14 @@ function install_flint (cmd)
     
     if ispc ()
         msys64_path = fullfile('c:', 'msys64', 'mingw64');
-        cflags = {cflags{:}, ['-I', fullfile(msys64_path, 'include')]};
+        setenv('MW_MINGW64_LOC', msys64_path)
+        cflags = [cflags(:)', {['-I', fullfile(msys64_path, 'include')]}];
         ldflags = {['-L', fullfile(msys64_path, 'lib')], fullfile(msys64_path, 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
     elseif ismac()
       [~, brew_path] = system ('brew --prefix');
       brew_path = deblank (brew_path);
-      cflags = {cflags{:}, ['-I', fullfile(brew_path, 'include')]};
-      ldflags = {ldflags{:}, ['-L', fullfile(brew_path, 'lib')]};
+      cflags = [cflags(:)', {['-I', fullfile(brew_path, 'include')]}];
+      ldflags = [ldflags(:)', {['-L', fullfile(brew_path, 'lib')]}];
     end
 
     try
@@ -37,7 +38,7 @@ function install_flint (cmd)
         mex (['CFLAGS="$CFLAGS ', strjoin(cflags, ' '), '"'], cfiles{:}, ldflags{:});
       end
       if ispc ()
-          copyfile (['mex_flint_interface.', mexext()], fullfile('c:', 'msys64', 'mingw64', 'bin'));
+          movefile (['mex_flint_interface.', mexext()], fullfile(msys64_path, 'bin'));
       end
     catch exception
       cd (old_dir);
@@ -50,7 +51,7 @@ function install_flint (cmd)
 
   add_to_path_if_not_exists (flint_dir);
   if ispc ()
-      add_to_path_if_not_exists (fullfile ('c', 'msys64', 'mingw64', 'bin'));
+      add_to_path_if_not_exists (fullfile (msys64_path, 'bin'));
   end
 
   disp ('FLINT is ready to use.');
