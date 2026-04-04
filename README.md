@@ -21,8 +21,8 @@ install_flint ()
 Output on success (given dependencies are installed, see details below):
 ```
 FLINT is ready to use.
-    Detected FLINT version: 3.0.1
-    Detected  MPFR version: 4.2.1
+    Detected FLINT version: 3.4.0
+    Detected  MPFR version: 4.2.2
     Detected   GMP version: 6.3.0
 ```
 
@@ -60,35 +60,18 @@ The FLINT Octave/Matlab MEX-interface consists of several source files in the
 
 #### Windows
 
-Please follow the instructions from <https://www.fil.ion.ucl.ac.uk/spm/docs/development/compilation/windows/>:
-
-> Download and install MSYS2 from <https://www.msys2.org/> in directory `C:\msys64`.
->
-> Then, from MSYS2, type:
-> ```
-> pacman -Syu
-> pacman -Su  
-> pacman -S --needed base-devel mingw-w64-x86_64-toolchain
-> pacman -S mingw-w64-x86_64-flint  
-> ```
->
-> Start MATLAB and type:
-> ```
-> setenv('MW_MINGW64_LOC', 'C:\msys64\mingw64')
-> mex -setup
-> % MEX configured to use 'MinGW64 Compiler (C)' for C language compilation.
-> ```
->
-> Do not worry if this warning is displayed:
-> ```
-> Warning: The MATLAB C and Fortran API has changed to support MATLAB
->      variables with more than 2^32-1 elements. You will be required
->      to update your code to utilize the new API.
-> ```
+Download and install MSYS2 from <https://www.msys2.org/> in directory `C:\msys64`.
+Then, from MSYS2, type:
+```
+pacman -Syu
+pacman -S --needed base-devel mingw-w64-x86_64-toolchain
+pacman -S mingw-w64-x86_64-flint  
+```
 
 See also:
 - <https://www.mathworks.com/matlabcentral/fileexchange/52848-matlab-support-for-mingw-w64-c-c-fortran-compiler>
-- <https://www.mathworks.com/support/requirements/supported-compilers.html>.
+- <https://www.mathworks.com/support/requirements/supported-compilers.html>
+- <https://www.fil.ion.ucl.ac.uk/spm/docs/development/compilation/windows/>
 
 
 #### Linux
@@ -100,7 +83,8 @@ To use MATLAB's MEX compiler, MATLAB must eventually started from Terminal with 
 export LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab 
 ```
 
-<https://www.mathworks.com/matlabcentral/answers/2021516-why-doesn-t-simple-mex-compilation-work-on-linux#answer_1340311>
+See also:
+- <https://www.mathworks.com/matlabcentral/answers/2021516-why-doesn-t-simple-mex-compilation-work-on-linux#answer_1340311>
 
 
 ### Octave with mex-compiler support
@@ -108,3 +92,16 @@ export LD_PRELOAD=/lib/x86_64-linux-gnu/libstdc++.so.6 matlab
 - Windows: <https://www.gnu.org/software/octave/download#ms-windows>
 - macOS: <https://formulae.brew.sh/formula/octave>
 - Linux: <https://github.com/gnu-octave/docker>
+
+
+## Development
+
+Unlock `mex_flint_interface.mex` for recompilation `install_flint rebuild`:
+```
+>> delete mex_flint_interface.mexw64
+Warning: File not found or permission denied 
+>> mex_flint_interface(0)
+>> clear all
+>> clear mex
+>> delete mex_flint_interface.mexw64
+```
