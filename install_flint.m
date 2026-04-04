@@ -14,6 +14,12 @@ old_dir = cd (flint_dir);
 
 if ispc ()
     msys64_path = fullfile('c:', 'msys64', 'mingw64');
+    msys64_path_bin = fullfile(msys64_path, 'bin');
+    msys64_path_lib = fullfile(msys64_path, 'lib');
+    % Allow MSYS2 runtime libraries to be found
+    if ~contains(getenv('PATH'), msys64_path_bin, "IgnoreCase",true)
+        setenv('PATH', [getenv('PATH'), ';', msys64_path_bin, ';']);
+    end
 end
 
 if (strcmp (cmd, 'rebuild') || exist (['mex_flint_interface.', mexext()], 'file') ~= 3)
@@ -24,9 +30,9 @@ if (strcmp (cmd, 'rebuild') || exist (['mex_flint_interface.', mexext()], 'file'
     ldflags = {'-lflint', '-lmpfr', '-lgmp'};
 
     if ispc ()
-        setenv('MW_MINGW64_LOC', msys64_path)
+        setenv('MW_MINGW64_LOC', msys64_path);
         cflags = [cflags(:)', {['-I', fullfile(msys64_path, 'include')]}];
-        ldflags = {['-L', fullfile(msys64_path, 'lib')], fullfile(msys64_path, 'lib', 'libflint.dll.a'), '-lmpfr', '-lgmp'};
+        ldflags = {['-L', msys64_path_lib], fullfile(msys64_path_lib, 'libflint.dll.a'), '-lmpfr', '-lgmp'};
     elseif ismac()
         [~, brew_path] = system ('brew --prefix');
         brew_path = deblank (brew_path);
@@ -40,9 +46,6 @@ if (strcmp (cmd, 'rebuild') || exist (['mex_flint_interface.', mexext()], 'file'
         else
             mex (['CFLAGS="$CFLAGS ', strjoin(cflags, ' '), '"'], cfiles{:}, ldflags{:});
         end
-        if ispc ()
-            movefile (['mex_flint_interface.', mexext()], fullfile(msys64_path, 'bin'), 'f');
-        end
     catch exception
         cd (old_dir);
         error ('MEX interface creation failed: %s\n\nFLINT cannot be used.', exception.message);
@@ -53,9 +56,6 @@ end
 cd (old_dir);
 
 add_to_path_if_not_exists (flint_dir);
-if ispc ()
-    add_to_path_if_not_exists (fullfile (msys64_path, 'bin'));
-end
 
 disp ('FLINT is ready to use.');
 disp (['    Detected FLINT version: ', mex_flint_interface(22)]);
