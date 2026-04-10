@@ -204,6 +204,72 @@ mex_arb_t (int nlhs, mxArray *plhs[],
         return;
       } 
 
+      case 1101: // void arb_sub(arb_t z, const arb_t x, const arb_t y, slong prec)
+      {
+        MEX_NARGINCHK (4);
+        MEX_ARB_T(1, x);
+        MEX_ARB_T(2, y);
+        MEX_SLONG (3, prec);
+        
+        if (x.start != x.end || y.start != y.end) {
+          MEX_FCN_ERR ("cmd[%d]: x and y must be scalar indices.\n", cmd_code);
+        }
+        idx_t z;
+        if (mex_arb_allocate (1, &z)) {
+          MEX_FCN_ERR ("cmd[%d]: Failed to allocate memory ARB variable.\n", cmd_code);
+        }
+        arb_sub (arb_data + z.start - 1, arb_data + x.start - 1, arb_data + y.start - 1, prec);
+        plhs[0] = mxCreateDoubleMatrix (1, 2, mxREAL);
+        double *vec = mxGetPr (plhs[0]);
+        vec[0] = (double) z.start;
+        vec[1] = (double) z.end;
+        return;
+      } 
+
+      case 1102: // void arb_mul(arb_t z, const arb_t x, const arb_t y, slong prec)
+      {
+        MEX_NARGINCHK (4);
+        MEX_ARB_T(1, x);
+        MEX_ARB_T(2, y);
+        MEX_SLONG (3, prec);
+        
+        if (x.start != x.end || y.start != y.end) {
+          MEX_FCN_ERR ("cmd[%d]: x and y must be scalar indices.\n", cmd_code);
+        }
+        idx_t z;
+        if (mex_arb_allocate (1, &z)) {
+          MEX_FCN_ERR ("cmd[%d]: Failed to allocate memory ARB variable.\n", cmd_code);
+        }
+        arb_mul (arb_data + z.start - 1, arb_data + x.start - 1, arb_data + y.start - 1, prec);
+        plhs[0] = mxCreateDoubleMatrix (1, 2, mxREAL);
+        double *vec = mxGetPr (plhs[0]);
+        vec[0] = (double) z.start;
+        vec[1] = (double) z.end;
+        return;
+      } 
+
+      case 1103: // void arb_div(arb_t z, const arb_t x, const arb_t y, slong prec)
+      {
+        MEX_NARGINCHK (4);
+        MEX_ARB_T(1, x);
+        MEX_ARB_T(2, y);
+        MEX_SLONG (3, prec);
+        
+        if (x.start != x.end || y.start != y.end) {
+          MEX_FCN_ERR ("cmd[%d]: x and y must be scalar indices.\n", cmd_code);
+        }
+        idx_t z;
+        if (mex_arb_allocate (1, &z)) {
+          MEX_FCN_ERR ("cmd[%d]: Failed to allocate memory ARB variable.\n", cmd_code);
+        }
+        arb_div (arb_data + z.start - 1, arb_data + x.start - 1, arb_data + y.start - 1, prec);
+        plhs[0] = mxCreateDoubleMatrix (1, 2, mxREAL);
+        double *vec = mxGetPr (plhs[0]);
+        vec[0] = (double) z.start;
+        vec[1] = (double) z.end;
+        return;
+      } 
+
 
       default:
         MEX_FCN_ERR ("Unknown command code '%d'\n", cmd_code);
