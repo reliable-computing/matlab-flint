@@ -182,6 +182,21 @@ mex_arb_t (int nlhs, mxArray *plhs[],
       }
 
 
+      case 1002: // arb_t.clear_and_init(arb_t x)
+      {
+        MEX_NARGINCHK (2);
+        MEX_ARB_T(1, idx);
+        
+        if (idx.start != idx.end) {
+          MEX_FCN_ERR ("cmd[%d]: idx must be a scalar index.\n", cmd_code);
+        }
+        DBG_PRINTF ("Release memory for arb_t '%d'.\n", idx.start);
+        arb_clear (arb_data + idx.start - 1);
+        arb_init (arb_data + idx.start - 1);
+        return;
+      }
+
+
       case 1100: // void arb_add(arb_t z, const arb_t x, const arb_t y, slong prec)
       {
         MEX_NARGINCHK (4);
