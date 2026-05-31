@@ -38,7 +38,7 @@ extern int VERBOSE;
 
 #define MEX_FCN_ERR(fmt, ...)                                   \
   { if (VERBOSE > 0)                                            \
-      mexErrMsgIdAndTxt ("flint:mexFunction",                     \
+      mexErrMsgIdAndTxt ("flint:mexFunction",                   \
                          "%s:%d:%s():" fmt, __FILE__, __LINE__, \
                          __func__, __VA_ARGS__);                \
     return; }
@@ -59,28 +59,6 @@ extern int VERBOSE;
   if (nrhs != (num))       \
     MEX_FCN_ERR ("cmd[%d]: Invalid number of arguments.\n", cmd_code);
 
-
-// Data type to handle index ranges.
-
-typedef struct
-{
-  size_t start;
-  size_t end;
-} idx_t;
-
-
-/**
- * Get length of index range.
- *
- * @param[in] idx Pointer index range.
- *
- * @returns length of index range.
- */
-inline size_t
-length (idx_t *idx)
-{
-  return (idx->end - idx->start + 1);
-}
 
 
 /**
@@ -145,8 +123,7 @@ extract_ui (int idx, int nrhs, const mxArray *prhs[], uint64_t *ui);
  * @returns success of extraction.
  */
 int
-extract_ui_vector (int idx, int nrhs, const mxArray *prhs[], uint64_t **ui,
-                   size_t len);
+extract_ui_vector (int idx, int nrhs, const mxArray *prhs[], uint64_t **ui, size_t len);
 
 
 #endif  // MEX_FLINT_INTERFACE_H_

@@ -9,8 +9,8 @@
  * (at your option) any later version.  See <https://www.gnu.org/licenses/>.
  */
 
-#ifndef MEX_ARB_T_H_
-#define MEX_ARB_T_H_
+#ifndef MEX_AXB_MAT_H_
+#define MEX_AXB_MAT_H_
 
 #include "flint/arb.h"
 
@@ -26,9 +26,9 @@
  * @param cmd_code code of command to execute (1000 - 1999).
  */
 void
-mex_arb_t (int nlhs, mxArray *plhs[],
-           int nrhs, const mxArray *prhs[],
-           uint64_t cmd_code);
+mex_axb_mat (int nlhs, mxArray *plhs[],
+             int nrhs, const mxArray *prhs[],
+             uint64_t cmd_code);
 
 
 /**
@@ -36,35 +36,7 @@ mex_arb_t (int nlhs, mxArray *plhs[],
  * After calling this function the initial state is restored.
  */
 void
-arb_tidy_up (void);
-
-
-/**
- * Check for valid index range.
- *
- * @param[in] idx Pointer to index (1-based, idx_t) of ARB variables.
- *
- * @returns `0` if `idx` is invalid, otherwise `idx` is valid.
- */
-int
-is_valid (idx_t *idx);
-
-
-/**
- * Safely read ARB index (idx_t) structure.
- *
- * @param[in] idx MEX input position index (0 is first).
- * @param[in] nrhs Number of right-hand sides.
- * @param[in] mxArray  MEX input array.
- * @param[out] idx_vec If function returns `1`, `idx_vec` contains a valid
- *                     index (idx_t) structure extracted from the MEX input,
- *                     otherwise `idx_vec` remains unchanged.
- *
- * @returns success of extraction.
- */
-int
-extract_idx (int idx, int nrhs, const mxArray *prhs[], idx_t *idx_vec);
-
+mex_axb_mat_tidy_up (void);
 
 
 /**
@@ -84,16 +56,15 @@ extract_slong (int idx, int nrhs, const mxArray *prhs[], int64_t *si);
 
 
 /**
- * Safely declare and read ARB_T variable(-arrays) from MEX interface.
+ * Safely declare and read ARB_MAT from MEX interface.
  *
  * @param mex_rhs Position (0-based) in MEX input.
  * @param name    Desired variable name.
  */
-#define MEX_ARB_T(mex_rhs, name)                                     \
-  idx_t name;                                                        \
-  if (! extract_idx ((mex_rhs), nrhs, prhs, &name))                  \
-    MEX_FCN_ERR ("cmd[%d]:"#name " Invalid ARB variable indices.\n", \
-                 cmd_code);
+#define MEX_AXB_MAT(mex_rhs, name)                                   \
+  axb_mat name;                                                      \
+  if (! extract_ui ((mex_rhs), nrhs, prhs, &name))                   \
+    MEX_FCN_ERR ("cmd[%d]:"#name " Invalid AXB_MAT variable indices.\n", cmd_code);
 
 
 /**
@@ -108,4 +79,4 @@ extract_slong (int idx, int nrhs, const mxArray *prhs[], int64_t *si);
     MEX_FCN_ERR ("cmd[%d]:"#name " must be a signed integer.\n", cmd_code);
 
 
-#endif  // MEX_ARB_T_H_
+#endif  // MEX_AXB_MAT_H_
