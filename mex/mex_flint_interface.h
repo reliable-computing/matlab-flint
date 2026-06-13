@@ -22,6 +22,7 @@
 #include "flint/flint.h"
 
 #include "mex.h"
+#include "mex_flint_commands.h"
 
 
 
@@ -36,18 +37,15 @@ extern int VERBOSE;
 // Macro to immediately return from current function.
 // Depending on `VERBOSE` variable an error message is printed.
 
-#define MEX_FCN_ERR(fmt, ...)                                   \
-  { if (VERBOSE > 0)                                            \
-      mexErrMsgIdAndTxt ("flint:mexFunction",                   \
-                         "%s:%d:%s():" fmt, __FILE__, __LINE__, \
-                         __func__, __VA_ARGS__);                \
+#define MEX_FCN_ERR(fmt, ...)                                                    \
+  { if (VERBOSE > 0)                                                             \
+      mexErrMsgIdAndTxt ("ap:mexFunction", "%s:%d:%s:%s():" fmt,                 \
+          __FILE__, __LINE__, __func__, get_cmd_string(cmd_code), __VA_ARGS__);  \
     return; }
 
 // Macro to print very verbose debug output, depends on `VERBOSE` variable.
-#define DBG_PRINTF(fmt, ...)                                \
-  { if (VERBOSE > 2)                                        \
-      mexPrintf ("DBG %s:%d:%s():" fmt, __FILE__, __LINE__, \
-                 __func__, __VA_ARGS__); }
+#define DBG_PRINTF(fmt, ...)  \
+  { if (VERBOSE > 2) mexPrintf ("DBG %s:%d:%s():" fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); }
 
 
 /**
@@ -55,9 +53,8 @@ extern int VERBOSE;
  *
  * @param num Desired number of MEX `nrhs`.
  */
-#define MEX_NARGINCHK(num) \
-  if (nrhs != (num))       \
-    MEX_FCN_ERR ("cmd[%d]: Invalid number of arguments.\n", cmd_code);
+#define MEX_NARGINCHK(num)  \
+  if (nrhs != (num)) MEX_FCN_ERR ("cmd[%d]: Invalid number of arguments.\n", cmd_code);
 
 
 

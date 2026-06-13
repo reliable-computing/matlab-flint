@@ -1,15 +1,15 @@
 /**
-* Copyright (C) 2026 Kai T. Ohlhus <kai.ohlhus@gmail.com>
-*
-* This file is part of MATLAB-FLINT.
-*
-* MATLAB-FLINT is free software: you can redistribute it and/or modify it under
-* the terms of the GNU Lesser General Public License (LGPL) as published
-* by the Free Software Foundation; either version 3 of the License, or
-* (at your option) any later version.  See <https://www.gnu.org/licenses/>.
-*/
+ * Copyright (C) 2026 Kai T. Ohlhus <kai.ohlhus@gmail.com>
+ *
+ * This file is part of MATLAB-FLINT.
+ *
+ * MATLAB-FLINT is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Lesser General Public License (LGPL) as published
+ * by the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.  See <https://www.gnu.org/licenses/>.
+ */
 
-#include "mex_arb_mat.h"
+#include "mex_axb_mat.h"
 
 #define DATA_CHUNK_SIZE 1000  // Allocate variables in chunks.
 
@@ -51,7 +51,7 @@ size_t  axb_mat_data_size     = 0;
 * After calling this function the initial state is restored.
 */
 void
-arb_tidy_up (void)
+axb_tidy_up (void)
 {
     DBG_PRINTF ("%s\n", "Call");
     for (size_t i = 0; i < axb_mat_data_size; i++) {
@@ -81,50 +81,44 @@ arb_tidy_up (void)
 *
 * @returns NULL on failure, pointer to.
 */
-axb_mat
-axb_mat_allocate ()
+axb_ptr
+axb_mat_allocate (slong r, slong c)
 {
     // Check if an unused element can be used
     for (size_t i = 0; i < axb_mat_data_capacity; i++)
     {
         if (axb_mat_data[i].state == UNUSED)
         {
-            arb_mat_init(arb_mat_t mat, slong r, slong c);
+            arb_mat_init(axb_mat_data[i].mat, r, c);
         }
     }
 
     // Check if there is enough space to create new ARB variables.
-    if ((arb_data_size + count) > arb_data_capacity)
+    if (axb_mat_data_size == axb_mat_data_capacity)
     {
-        // Determine new capacity.
-        size_t new_capacity = arb_data_capacity;
-        while ((arb_data_size + count) > new_capacity)
-            new_capacity += DATA_CHUNK_SIZE;
+        size_t new_capacity = axb_mat_data_capacity + DATA_CHUNK_SIZE;
 
         DBG_PRINTF ("Increase capacity to '%d'.\n", new_capacity);
         // Reallocate memory.
         if (axb_mat_data == NULL)
         {
-            axb_mat_data = (arb_ptr) mxMalloc (new_capacity * sizeof(arb_t));
+            axb_mat_data = (axb_ptr) mxMalloc (new_capacity * sizeof(axb_mat));
         }
         else
-            axb_mat_data = (arb_ptr) mxRealloc (arb_data, new_capacity * sizeof(arb_t));
-        if (arb_data == NULL)
-            return (-1); // Memory allocation failed.
+            axb_mat_data = (axb_ptr) mxRealloc (axb_mat_data, new_capacity * sizeof(axb_mat));
+        if (axb_mat_data == NULL)
+            return (NULL); // Memory allocation failed.
 
         mexMakeMemoryPersistent (axb_mat_data);
 
         // Initialize new ARB variables.
-        for (size_t i = arb_data_capacity; i < new_capacity; i++)
-            arb_init (arb_data + i);
+        for (size_t i = axb_mat_data_capacity; i < new_capacity; i++)
+            arb_mat_init(axb_mat_data[i].mat, r, c);
 
-        arb_data_capacity = new_capacity;
+        axb_mat_data_capacity = new_capacity;
     }
 
-    idx->start     = arb_data_size + 1;
-    arb_data_size += count;
-    idx->end       = arb_data_size;
-    DBG_PRINTF ("New ARB variable [%d:%d] allocated.\n", idx->start, idx->end);
+    DBG_PRINTF ("%s\n", "New AXB_MAT variable allocated.");
     return (0);
 }
 

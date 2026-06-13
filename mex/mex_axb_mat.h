@@ -12,9 +12,12 @@
 #ifndef MEX_AXB_MAT_H_
 #define MEX_AXB_MAT_H_
 
-#include "flint/arb.h"
+#include "flint/acb_mat.h"
+#include "flint/arb_mat.h"
+#include "flint/flint.h"
 
 #include "mex_flint_interface.h"
+#include "mex_flint_commands.h"
 
 /**
  * MEX interface for arb_t data type.
@@ -28,7 +31,7 @@
 void
 mex_axb_mat (int nlhs, mxArray *plhs[],
              int nrhs, const mxArray *prhs[],
-             uint64_t cmd_code);
+             CmdCode cmd_code);
 
 
 /**
@@ -64,7 +67,7 @@ extract_slong (int idx, int nrhs, const mxArray *prhs[], int64_t *si);
 #define MEX_AXB_MAT(mex_rhs, name)                                   \
   axb_mat name;                                                      \
   if (! extract_ui ((mex_rhs), nrhs, prhs, &name))                   \
-    MEX_FCN_ERR ("cmd[%d]:"#name " Invalid AXB_MAT variable indices.\n", cmd_code);
+    MEX_FCN_ERR ("%s:"#name " Invalid AXB_MAT variable indices.\n", get_cmd_string(cmd_code));
 
 
 /**
@@ -76,7 +79,7 @@ extract_slong (int idx, int nrhs, const mxArray *prhs[], int64_t *si);
 #define MEX_SLONG(mex_rhs, name)                                       \
   slong name = 0;                                                      \
   if (! extract_slong ((mex_rhs), nrhs, prhs, &name))                  \
-    MEX_FCN_ERR ("cmd[%d]:"#name " must be a signed integer.\n", cmd_code);
+    MEX_FCN_ERR ("%s:"#name " must be a signed integer.\n", get_cmd_string(cmd_code));
 
 
 #endif  // MEX_AXB_MAT_H_

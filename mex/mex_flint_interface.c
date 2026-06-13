@@ -10,7 +10,7 @@
  */
 
 #include "mex_flint_interface.h"
-#include "mex_arb_t.h"
+#include "mex_axb_mat.h"
 
 
 // State deciding about the output verbosity level
@@ -38,7 +38,7 @@ mexFunction (int nlhs, mxArray *plhs[],
   }
 
   // Read command code.
-  uint64_t cmd_code = 0;
+  CmdCode cmd_code = 0;
 
   if (! extract_ui (0, nrhs, prhs, &cmd_code))
     MEX_FCN_ERR ("%s\n", "First argument must be a command code (non-negative integer).");
@@ -49,33 +49,33 @@ mexFunction (int nlhs, mxArray *plhs[],
    * Branch to specialized interfaces.
    */
   if ((1000 <= cmd_code) && (cmd_code < 2000))
-    mex_arb_t (nlhs, plhs, nrhs, prhs, cmd_code);
+    mex_axb_mat (nlhs, plhs, nrhs, prhs, cmd_code);
 
-  else if (cmd_code == 0)  // void flint.clear (void)
+  else if (cmd_code == AP_CLEAR)  // void flint.clear (void)
     {
       MEX_NARGINCHK (1);
       mexUnlock();
       locked = 0;
-      arb_tidy_up();
+      axb_tidy_up();
     }
   
-  else if (cmd_code == 10)  // void flint.set_verbose (int level)
+  else if (cmd_code == AP_SET_VERBOSE)  // void f(int level)
     {
       MEX_NARGINCHK (2);
       int64_t level = 1;
       if (extract_si (1, nrhs, prhs, &level) && (0 <= level) && (level <= 3))
         VERBOSE = (int) level;
       else
-        MEX_FCN_ERR ("cmd[%s]: VERBOSE must be 0, 1, 2, or 3.\n", "flint.set_verbose");
+        MEX_FCN_ERR ("%s\n", "VERBOSE must be 0, 1, 2, or 3.");
     }
 
-  else if (cmd_code == 11)  // int flint.get_verbose (void)
+  else if (cmd_code == AP_GET_VERBOSE)  // int f(void)
     {
       MEX_NARGINCHK (1);
       plhs[0] = mxCreateDoubleScalar ((double) VERBOSE);
     }
 
-  else if (cmd_code == 20)  // int flint.get_gmp_version (void)
+  else if (cmd_code == AP_GET_GMP_VERSION)  // str f(void)
     {
       MEX_NARGINCHK (1);
       char *output_buf = (char *) mxCalloc (strlen (gmp_version), sizeof(char));
@@ -84,7 +84,7 @@ mexFunction (int nlhs, mxArray *plhs[],
       return;
     }
   
-  else if (cmd_code == 21)  // int flint.get_mpfr_version (void)
+  else if (cmd_code == AP_GET_MPFR_VERSION)  // str f(void)
     {
       MEX_NARGINCHK (1);
       char *output_buf = (char *) mxCalloc (strlen (mpfr_get_version ()) + 1, sizeof(char));
@@ -93,7 +93,7 @@ mexFunction (int nlhs, mxArray *plhs[],
       return;
     }
 
-  else if (cmd_code == 22)  // int flint.get_flint_version (void)
+  else if (cmd_code == AP_GET_FLINT_VERSION)  // str f(void)
     {
       MEX_NARGINCHK (1);
       char *output_buf = (char *) mxCalloc (strlen (FLINT_VERSION), sizeof(char));
